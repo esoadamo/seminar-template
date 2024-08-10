@@ -1,0 +1,108 @@
+#!/usr/bin/env python3
+
+from utils.checker_helpers import wrap_student_module, student_function, exception_str, student_test
+from utils.import_reporter import BadImport
+
+# import custom_code # this is example of how to import your own file. Don't forget to copy it in `merge` file.
+
+# This file contains tests for participant`s solution.
+# This file is executed in sandbox, participant`s solution is imported.
+
+# Warning: this file is potentially visible to participant!
+# (with significant amount of work)
+
+CORRECT_SOLUTION = "#KSI_EVAL_CORRECT_SOLUTION#"
+INCORRECT_SOLUTION = "#KSI_EVAL_INCORRECT_SOLUTION#"
+SOLUTION_CRASHED = "#KSI_EVAL_SOLUTION_CRASHED#"
+SHOW_MSG_TO_USER = "#KSI_EVAL_SHOW_MSG_TO_USER#"
+GIVE_SCORE = "#KSI_EVAL_GIVE_SCORE#"
+GIVE_ACHIEVEMENT = "#KSI_EVAL_GIVE_ACHIEVEMENT#"
+
+ALLOWED_LIBS = ['typing', 'math']
+EMPTY_STDOUT_ON_LOAD = False
+TESTED_FUNCTION = 'is_odd'
+
+# tests_against_implementation = [] # If you don't want to test against the correct implementation, uncomment this line and comment out the declaration on line bellow.
+tests_against_implementation = [
+    ('public', [(0,), (1,)]),
+    ('hidden', []),
+    ('edge_cases', [(-1,), (-2,)]),
+]
+
+incorrect_answer_messages_for_categories = {
+    'public': "Odpovídáš špatně i na základních testech.",
+    'edge_cases': "Minimálně na jednom z okrajových případů odpovídáš špatně."
+}
+incorect_answer_message_no_match_for_category = 'Na některém ze vstupů odpovídáš špatně.'
+
+
+crash_messages_for_categories = {
+    'public': "Padáš i na základních testech.",
+    'edge_cases': "Minimálně na jednom z okrajových případů tvůj kód spadl."
+}
+
+
+def correct_implementation(x: int) -> bool:
+    return x % 2 == 1
+
+
+# -------------- Most of the time you don't have to edit anything bellow this line. --------------
+
+
+def report(msg: str) -> None:
+    print(SHOW_MSG_TO_USER, msg)
+
+
+def main() -> None:
+    failed = False
+    single_input = "special"
+    test_type = "special"
+
+    try:
+        student = wrap_student_module(
+            'participant.py', ALLOWED_LIBS,
+            EMPTY_STDOUT_ON_LOAD, module_name='student_check'
+        )
+        print("#KSI_META_OUTPUT_0a859a#")
+        student_func = student_function(student, TESTED_FUNCTION)
+
+        # Test against correct implementation
+        for test_type, tinputs in tests_against_implementation:
+            for single_input in tinputs:
+                student_test(student_func, correct_implementation, *single_input)
+
+    except BadImport as exc:
+        if exc.args[0] == 'unicodedata':
+            msg = "Používáte v názvech funkcí nebo proměnných ne-ASCII znaky."
+        else:
+            msg = "Odevzdané řešení používá nepovolenou knihovnu: " \
+                + exc.args[0]
+        report(msg)
+        print(SOLUTION_CRASHED)
+        failed = True
+
+    except AssertionError as e:
+        report(incorrect_answer_messages_for_categories.get(test_type, incorect_answer_message_no_match_for_category))
+        print(INCORRECT_SOLUTION)
+        failed = True
+
+    except Exception as e:
+        report("Nastala neočekávaná chyba při spouštění testů:")
+        report(exception_str(e))
+        if test_type in crash_messages_for_categories:
+            report(crash_messages_for_categories[test_type])
+        print(SOLUTION_CRASHED)
+        failed = True
+
+    # if False:
+    #     print(GIVE_ACHIEVEMENT, 4)
+
+    # if False:
+    #     print(GIVE_SCORE, 4.2)
+
+    if not failed:
+        print(CORRECT_SOLUTION)
+
+
+if __name__ == '__main__':
+    main()

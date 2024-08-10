@@ -1,0 +1,11 @@
+{
+	"type": "programming",
+	"max_points": 2,
+	"autocorrect": true,
+	"bonus": false,
+	"action": null,
+
+	"programming": {
+		"version": "2.0"
+	}
+}
