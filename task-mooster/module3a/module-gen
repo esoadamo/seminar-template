@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+
+"""
+Tady se muze dit cokoliv, timeout na skript je 10 s, mel by vsak sebehnout
+co nejrychleji, aby resitele zbytecne necekali na nacteni ulohy.
+"""
+
+print(
+"""{
+  "quiz": [
+    {
+      "type": "checkbox",
+      "question": "Vyber tučňáky",
+      "correct": [
+        0, 2
+      ],
+      "text": "Pomocný text zde.",
+      "options": [
+        "Los Karlos",
+        "Sob Karsob",
+        "Karlík",
+        "Donimika"
+      ]
+    },
+    {
+      "type": "radio",
+      "question": "Je nebe modré",
+      "correct": [
+        0
+      ],
+      "text": "",
+      "options": [
+        "Ano",
+        "Ne"
+      ]
+    }
+  ],
+  "description_replace": {
+    "to-replace": "Tady je automaticky vygenerovaný text.",
+    "to-replace-2": "Tady je další automaticky generovaný text."
+  }
+}"""
+)

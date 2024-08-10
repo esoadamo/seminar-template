@@ -1,0 +1,46 @@
+#!/usr/bin/env python3
+
+# This is a very simple example how to have a custom evaluation of participants code without the regulra framework.
+
+# import custom_code # this is example of how to import your own file. Don't forget to copy it in `merge` file.
+
+# This file contains tests for participant`s solution.
+# This file is executed in sandbox, participant`s solution is imported.
+
+# Warning: this file is potentially visible to participant!
+# (with significant amount of work)
+
+import participant as p  # in the sandbox the submission will be in participant.py. For testing you can create it locally.
+
+print("#KSI_META_OUTPUT_0a859a#")
+
+
+CORRECT_SOLUTION = "#KSI_EVAL_CORRECT_SOLUTION#"
+INCORRECT_SOLUTION = "#KSI_EVAL_INCORRECT_SOLUTION#"
+SOLUTION_CRASHED = "#KSI_EVAL_SOLUTION_CRASHED#"
+SHOW_MSG_TO_USER = "#KSI_EVAL_SHOW_MSG_TO_USER#"
+GIVE_SCORE = "#KSI_EVAL_GIVE_SCORE#"
+GIVE_ACHIEVEMENT = "#KSI_EVAL_GIVE_ACHIEVEMENT#"
+
+
+def report(msg: str) -> None:
+    print(SHOW_MSG_TO_USER, msg)
+
+
+def main() -> None:
+    try:
+        assert p.is_odd(3) == True
+        print(CORRECT_SOLUTION)
+        # print(GIVE_ACHIEVEMENT, 4)
+
+    except AssertionError:
+        print(INCORRECT_SOLUTION)
+        # report("Tve reseni selhalo na testu xyz.")
+        # print(GIVE_SCORE, 4.2)
+    
+    except Exception as e:
+        print(SOLUTION_CRASHED)
+        # report(f"Tve reseni selhalo vyjimkou {e}")
+
+if __name__ == '__main__':
+    main()

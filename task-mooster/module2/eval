@@ -1,0 +1,103 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+from typing import Optional
+import json
+
+CORRECT_SOLUTION = "#KSI_EVAL_CORRECT_SOLUTION#"
+INCORRECT_SOLUTION = "#KSI_EVAL_INCORRECT_SOLUTION#"
+SOLUTION_CRASHED = "#KSI_EVAL_SOLUTION_CRASHED#"
+SHOW_MSG_TO_USER = "#KSI_EVAL_SHOW_MSG_TO_USER#"
+GIVE_SCORE = "#KSI_EVAL_GIVE_SCORE#"
+GIVE_ACHIEVEMENT = "#KSI_EVAL_GIVE_ACHIEVEMENT#"
+
+# Evaluate participant`s solution.
+# Check output of script ran in sandbox.
+# Return value 0 means correct solution, other codes mean incorrect solution.
+# Only organizes sees stdout of this script.
+# Non-empty stderr of this script is considered as internal error.
+
+# Output before META directive is in "./output" file.
+# Output after META directive is in "./secret" file.
+
+
+def output_msg_or_score(msg: Optional[str] = None,
+                        score: Optional[float] = None):
+    output_dict = {}
+
+    if msg:
+        output_dict['message'] = msg
+    if score:
+        output_dict['score'] = score
+
+    with open('eval.out', 'w', encoding="utf8") as f:
+        f.write(json.dumps(output_dict))
+
+
+def give_achievement(achievement_id: int):
+    print(f'action add_achievement {achievement_id}')
+
+
+def main():
+    # Load output of `check` script.
+    with open(os.path.join("secret"), "r", encoding="utf8") as f:
+        lines = f.read().splitlines()
+
+    is_correct = False
+    is_incorrect = False
+    msg = ""
+    score = None
+    achievement = None
+
+    for line in lines:
+        line = line.strip()
+
+        if CORRECT_SOLUTION == line:
+            is_correct = True
+
+        if INCORRECT_SOLUTION == line or SOLUTION_CRASHED == line:
+            is_incorrect = True
+
+        if line.startswith(SHOW_MSG_TO_USER):
+            msg += f'{line.split(SHOW_MSG_TO_USER, 1)[1].strip()}\n'
+
+        if line.startswith(GIVE_SCORE):
+            score = float(line.split(GIVE_SCORE, 1)[1].strip())
+
+        if line.startswith(GIVE_ACHIEVEMENT):
+            score = int(line.split(GIVE_ACHIEVEMENT, 1)[1].strip())
+
+    if is_incorrect:
+        # Incorrect flag can override correct flag.
+        # If solution is incorrect, no achievement or partial score is awarded.
+        is_correct = False
+
+        if msg:
+            output_msg_or_score(msg)
+        elif SOLUTION_CRASHED:
+            output_msg_or_score("[!] Tvoje řešení spadlo. Nejspíše máš chybu v"
+                                " kódu, nebo nemáš pokrytý nějaký případ.")
+        sys.exit(1)
+
+    if is_correct:
+        output_msg_or_score(msg, score)
+        if achievement:
+            give_achievement(achievement)
+        print("OK")
+        sys.exit(0)
+
+    # If a solution is neither correct not incorrect, the `check` script might
+    # have crashed.
+
+    output_msg_or_score(
+        "[!] Nastala neznámá chyba. Korektní řešení by to způsobit nemělo, "
+        "zkus si zkontrolovat své řešení. Pokud si po 24 hodinách nebudeš "
+        "vedět rady, napiš nám v diskuzi."
+    )
+
+    print("Unknown error:", lines)
+    sys.exit(8)
+
+
+main()

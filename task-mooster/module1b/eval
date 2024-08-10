@@ -1,0 +1,40 @@
+#!/usr/bin/env python3
+
+import json
+import re
+import sys
+
+
+def outputMsg(msg):
+    with open('eval.out', 'w', encoding="utf8") as f:
+        f.write(json.dumps({
+            'message': msg
+        }))
+
+
+# odpoved na 1. otazku je v sys.argv[1]
+# odpoved na 2. otazku je v sys.argv[2]
+# etc
+
+# sys.exit(0) znamena, ze je odevzdani uspesne
+# sys.exit(1) znamena, ze je odevzdani neuspesne
+
+# pokud potrebujes ID uzivatele, nachazi se v promenne prostredi KSI_USER (napr. os.environ.get('KSI_USER'))
+
+# pomoci outputMsg lze vypsat libovolna hlaska
+
+# jak vyhodnotis, zda je odopoved spravna nebo ne, je na tobe. Nekteri radi pouzivaji regex, jini zas cisty Python.
+
+if not re.match(r"^\s*ODPOVED_1\s*$", sys.argv[1], re.IGNORECASE):
+    outputMsg("[!] Tvoje první odpověď není správná. Zkontroluj si, zda odpovídáš ve formátu, které od tebe požaduje zadání.")
+    sys.exit(1)
+
+
+def normalize_answer(x: str):
+    return x.lower().strip()
+
+if normalize_answer("odpoved_2") != normalize_answer(sys.argv[2]):
+    outputMsg("[!] Tvoje druhá odpověď není správná. Zkontroluj si, zda odpovídáš ve formátu, které od tebe požaduje zadání.")
+    sys.exit(1)
+
+sys.exit(0) # spravna odpoved
