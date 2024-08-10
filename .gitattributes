@@ -1,0 +1,14 @@
+# All automatically parsed KSI files should be normalized (Convert crlf => lf)
+eval text
+merge text
+check text
+assignment.md text
+solution.md text
+module.md text
+task.json text
+module.json text
+
+
+# Custom .py files are more and more used in programming modules for evaluation. For that purpose normalize them as well.
+# Folder matching sadly doesn't work from .gitattributes, so this will normalize all the .py files.
+*.py text
